@@ -4,8 +4,9 @@ const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
 const app = express();
 app.use(cors());
 app.use(express.json());
-const port = process.env.PORT || 5000;
 require("dotenv").config();
+const port = process.env.PORT || 5000;
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 
 const uri =
@@ -21,6 +22,8 @@ async function run() {
   try {
     const database = client.db("Skill-judge");
     const qnaCollection = database.collection("qna");
+    const servicesCollection = database.collection("services")
+    const paymentsCollection = database.collection("payments")
 
 
 
@@ -49,8 +52,53 @@ async function run() {
 
       res.send(result);
     });
+    
+    // services
+    app.get("/services", async (req, res) => {
+      const query = {}
+      const result = await servicesCollection.find(query).toArray();
+      res.send(result)
+    })
+    app.get("/book/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) }
+      const result = await servicesCollection.find(query).toArray();
+      res.send(result)
+    })
 
 
+// payments
+    		app.post("/create-payment-intent", async (req, res) => {
+					const payment = req.body;
+					const price = payment.price;
+					const amount = parseFloat(price * 100);
+					const paymentIntent = await stripe.paymentIntents.create({
+						currency: "usd",
+						amount: amount,
+						payment_method_types: ["card"],
+					});
+					res.send({
+						clientSecret: paymentIntent.client_secret,
+					});
+				});
+
+				app.post("/payments", async (req, res) => {
+					const payments = req.body;
+					const result = await paymentsCollection.insertOne(payments);
+					const id = payments.paymentId;
+					const filter = { _id: ObjectId(id) };
+					const updateDos = {
+						$set: {
+							paid: true,
+							transactionId: payments.transactionId,
+						},
+					};
+					const updateResult = await servicesCollection.updateOne(
+						filter,
+						updateDos
+					);
+					res.send({ updateResult, update });
+				});
 
 
 
