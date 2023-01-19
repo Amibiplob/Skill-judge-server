@@ -45,17 +45,17 @@ async function run() {
             res.send(result);
         });
 
-        // search question endpoint
+        // partial search question endpoint
         app.get("/search-qna", async (req, res) => {
             let searchResult;
-
             if (req.query.searchQuery) {
                 const cursor = qnaCollection.find({
-                    $text: { $search: req.query.searchQuery },
+                    $text: { $search: `\"${req.query.searchQuery}\"` },
                 });
                 searchResult = await cursor.toArray();
+            } else {
+                searchResult = await qnaCollection.find({}).toArray();
             }
-            console.log(req.query.searchQuery, searchResult);
             res.send(searchResult);
         });
 
