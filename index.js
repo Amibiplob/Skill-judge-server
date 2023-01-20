@@ -25,22 +25,19 @@ async function run() {
     const servicesCollection = database.collection("services")
     const paymentsCollection = database.collection("payments")
     const topQuestionsCollection = database.collection("topquestions")
-
+  const userCollection = database.collection("user");
 
 
 
     
-    app.get("/qnasingle", async (req, res) => {
-      const id = req.query.id;
+    app.get("/qnasingle/:id", async (req, res) => {
+      const id = req.params.id;
       const query = { _id: ObjectId(id) };
 
       const result = await qnaCollection.findOne(query);
 
-      res.send(result);
+      res.send([result]);
     });
-
-
-
 
 
 
@@ -54,6 +51,28 @@ async function run() {
       res.send(result);
     });
     
+//userCollection
+
+    
+    app.get("/user", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+
+      const result = await qnaCollection.findOne(query);
+
+      res.send(result);
+    });
+
+
+    app.post("/user", async (req, res) => {
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+
+      res.send(result);
+    });
+
+
+
     // services
     app.get("/services", async (req, res) => {
       const query = {}
@@ -121,7 +140,7 @@ async function run() {
 
 
 
-    app.post("qna", async (req, res) => {
+    app.post("/qna", async (req, res) => {
       const qna = req.body;
       const result = await qnaCollection.insertOne(qna);
 
