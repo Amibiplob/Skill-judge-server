@@ -24,6 +24,7 @@ async function run() {
     const qnaCollection = database.collection("qna");
     const servicesCollection = database.collection("services")
     const paymentsCollection = database.collection("payments")
+    const topQuestionsCollection = database.collection("topquestions")
 
 
 
@@ -65,6 +66,20 @@ async function run() {
       const result = await servicesCollection.find(query).toArray();
       res.send(result)
     })
+
+
+    // top-questions
+    app.get("/topquestions", async (req, res) => {
+      const query = {}
+      const result = await topQuestionsCollection.find(query).toArray();
+      res.send(result)
+    })
+    app.get("/topquestions/:id", async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: ObjectId(id) };
+			const result = await topQuestionsCollection.find(query).toArray();
+			res.send(result);
+		});
 
 
 // payments
