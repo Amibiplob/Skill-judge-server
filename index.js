@@ -60,34 +60,6 @@ async function run() {
       res.send(searchResult);
     });
 
-    // services
-    app.get("/services", async (req, res) => {
-      const query = {};
-      const result = await servicesCollection.find(query).toArray();
-      res.send(result);
-    });
-
-    app.get("/book/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await servicesCollection.find(query).toArray();
-      res.send(result);
-    });
-
-    // payments
-    app.post("/create-payment-intent", async (req, res) => {
-      const payment = req.body;
-      const price = payment.price;
-      const amount = parseFloat(price * 100);
-      const paymentIntent = await stripe.paymentIntents.create({
-        currency: "usd",
-        amount: amount,
-        payment_method_types: ["card"],
-      });
-      res.send({
-        clientSecret: paymentIntent.client_secret,
-      });
-    });
 
 
 
@@ -161,10 +133,6 @@ async function run() {
       );
       res.send({ updateResult, update });
     });
-
-
-
-
 
 
 
