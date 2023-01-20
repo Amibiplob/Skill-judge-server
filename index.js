@@ -41,9 +41,6 @@ async function run() {
 
 
 
-
-
-
     app.get("/qna", async (req, res) => {
       const query = {};
 
