@@ -18,45 +18,71 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         const database = client.db("Skill-judge");
-        const qnaCollection = database.collection("qna");
+        const questionCollection = database.collection(
+            "userquestionCollection"
+        );
         const servicesCollection = database.collection("services");
         const paymentsCollection = database.collection("payments");
+        const topQuestionsCollection = database.collection("topquestions");
+        const userCollection = database.collection("user");
 
-        app.get("/qnasingle", async (req, res) => {
-            const id = req.query.id;
+        app.get("/qnasingle/:id", async (req, res) => {
+            const id = req.params.id;
             const query = { _id: ObjectId(id) };
-
-            const result = await qnaCollection.findOne(query);
-
-            res.send(result);
-        });
-
-        // question answer
-        app.post("qna", async (req, res) => {
-            const qna = req.body;
-            const result = await qnaCollection.insertOne(qna);
-            res.send(result);
+            const result = await questionCollection.findOne(query);
+            res.send([result]);
         });
 
         app.get("/qna", async (req, res) => {
             const query = {};
-            const cursor = qnaCollection.find(query);
+            const cursor = questionCollection.find(query);
             const result = await cursor.toArray();
+            console.log(result);
             res.send(result);
         });
 
         // partial search question
         app.get("/search-qna", async (req, res) => {
-            let searchResult;
-            if (req.query.searchQuery) {
-                const cursor = qnaCollection.find({
-                    $text: { $search: `\"${req.query.searchQuery}\"` },
-                });
-                searchResult = await cursor.toArray();
-            } else {
-                searchResult = await qnaCollection.find({}).toArray();
+            try {
+                let searchResult;
+                if (req.query.searchQuery) {
+                    const cursor = questionCollection.find({
+                        $text: { $search: `\"${req.query.searchQuery}\"` },
+                    });
+                    searchResult = await cursor.toArray();
+                } else {
+                    searchResult = await questionCollection.find({}).toArray();
+                }
+                res.send(searchResult);
+            } catch (error) {
+                res.status(500).json({ message: "something went wrong!" });
             }
-            res.send(searchResult);
+        });
+
+        //userCollection
+
+        app.get("/user", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+
+            const result = await questionCollection.findOne(query);
+
+            res.send(result);
+        });
+
+        app.post("/user", async (req, res) => {
+            const user = req.body;
+            const result = await userCollection.insertOne(user);
+
+            res.send(result);
+        });
+        app.post("/send-question", async (req, res) => {
+            const question = req.body;
+            const result = await questionCollection.insertOne(question);
+            res.send({
+                data: result,
+                message: "Your Question Send Succesfully",
+            });
         });
 
         // services
@@ -65,11 +91,23 @@ async function run() {
             const result = await servicesCollection.find(query).toArray();
             res.send(result);
         });
-
         app.get("/book/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await servicesCollection.find(query).toArray();
+            res.send(result);
+        });
+
+        // top-questions
+        app.get("/topquestions", async (req, res) => {
+            const query = {};
+            const result = await topQuestionsCollection.find(query).toArray();
+            res.send(result);
+        });
+        app.get("/topquestions/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await topQuestionsCollection.find(query).toArray();
             res.send(result);
         });
 
@@ -104,6 +142,13 @@ async function run() {
                 updateDos
             );
             res.send({ updateResult, update });
+        });
+
+        app.post("/qna", async (req, res) => {
+            const qna = req.body;
+            const result = await questionCollection.insertOne(qna);
+
+            res.send(result);
         });
     } finally {
     }
