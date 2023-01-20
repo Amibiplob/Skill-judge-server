@@ -21,11 +21,6 @@ async function run() {
   try {
     const database = client.db("Skill-judge");
     const qnaCollection = database.collection("qna");
-
-
-
-
-    
     app.get("/qnasingle", async (req, res) => {
       const id = req.query.id;
       const query = { _id: ObjectId(id) };
@@ -45,28 +40,9 @@ async function run() {
 
       const cursor = qnaCollection.find(query);
 
-      const result = await cursor.toArray();
-
+      const result = await cursor.toArray()
       res.send(result);
     });
-
-
-
-
-
-
-
-
-
-    app.post("qna", async (req, res) => {
-      const qna = req.body;
-      const result = await qnaCollection.insertOne(qna);
-
-      res.send(result);
-    });
-
-
-
 
 
 
