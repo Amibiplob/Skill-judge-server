@@ -45,7 +45,7 @@ async function run() {
             res.send(result);
         });
 
-        // partial search question endpoint
+        // partial search question
         app.get("/search-qna", async (req, res) => {
             let searchResult;
             if (req.query.searchQuery) {
