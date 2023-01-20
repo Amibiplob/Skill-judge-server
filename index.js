@@ -21,21 +21,19 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const database = client.db("Skill-judge");
-    const qnaCollection = database.collection("qna");
+    const questionCollection = database.collection("userquestionCollection");
     const servicesCollection = database.collection("services")
     const paymentsCollection = database.collection("payments")
     const topQuestionsCollection = database.collection("topquestions")
-  const userCollection = database.collection("user");
-
+    const userCollection = database.collection("user");
+     
 
 
     
     app.get("/qnasingle/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-
-      const result = await qnaCollection.findOne(query);
-
+      const result = await questionCollection.findOne(query);
       res.send([result]);
     });
 
@@ -43,11 +41,9 @@ async function run() {
 
     app.get("/qna", async (req, res) => {
       const query = {};
-
-      const cursor = qnaCollection.find(query);
-
+      const cursor = questionCollection.find(query);
       const result = await cursor.toArray();
-
+      console.log(result)
       res.send(result);
     });
     
@@ -58,7 +54,7 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
 
-      const result = await qnaCollection.findOne(query);
+      const result = await questionCollection.findOne(query);
 
       res.send(result);
     });
@@ -69,6 +65,14 @@ async function run() {
       const result = await userCollection.insertOne(user);
 
       res.send(result);
+    });
+    app.post("/send-question", async (req, res) => {
+      const question = req.body;
+      const result = await questionCollection.insertOne(question);
+      res.send({
+        data:result,
+        message:"Your Question Send Succesfully"
+      });
     });
 
 
@@ -142,7 +146,7 @@ async function run() {
 
     app.post("/qna", async (req, res) => {
       const qna = req.body;
-      const result = await qnaCollection.insertOne(qna);
+      const result = await questionCollection.insertOne(qna);
 
       res.send(result);
     });
