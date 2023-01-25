@@ -7,16 +7,14 @@ app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 5000;
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const { loadPyodide } = require("pyodide");
 
-
-const uri =
-  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@skill-judge.old6dyc.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@skill-judge.old6dyc.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-
 
 async function run() {
   try {
@@ -26,7 +24,7 @@ async function run() {
     const paymentsCollection = database.collection("payments");
     const topQuestionsCollection = database.collection("topquestions");
     const userCollection = database.collection("user");
-
+    // Question
     app.get("/qnasingle/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -41,7 +39,22 @@ async function run() {
       console.log(result);
       res.send(result);
     });
-    // partial search question
+
+
+
+
+    // Compiler
+app.post("/compiler", async (req, res) => {
+  let pyodide = await loadPyodide();
+  let result = await pyodide.runPythonAsync(req.body.code);
+
+  res.json(result);
+});
+
+
+
+
+   // partial search question
     app.get("/search-qna", async (req, res) => {
       try {
         let searchResult;
@@ -155,16 +168,9 @@ async function run() {
 
 run().catch(console.dir);
 
-
-
-
-
-
 app.get("/", (req, res) => {
   res.send("server is working");
 });
-
-
 
 app.listen(port, () => {
   console.log("server is working", port);
