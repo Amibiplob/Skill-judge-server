@@ -23,7 +23,7 @@ async function run() {
     const servicesCollection = database.collection("services");
     const paymentsCollection = database.collection("payments");
     const topQuestionsCollection = database.collection("topquestions");
-    const questionsCollection = database.collection("questions");
+    const questionsCollection = database.collection("question");
     const userCollection = database.collection("user");
     // Question
     app.get("/qnasingle/:id", async (req, res) => {
