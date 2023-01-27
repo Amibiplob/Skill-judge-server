@@ -22,6 +22,7 @@ async function run() {
   try {
     const database = client.db("Skill-judge");
     const questionCollection = database.collection("userquestionCollection");
+    const problemCollection=database.collection("allProblemCollection")
     const servicesCollection = database.collection("services")
     const paymentsCollection = database.collection("payments")
     const topQuestionsCollection = database.collection("topquestions")
@@ -32,9 +33,9 @@ async function run() {
     
     app.get("/qnasingle/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await questionCollection.findOne(query);
-      res.send([result]);
+      // const query = { _id: ObjectId(id) };
+      // const result = await questionCollection.findOne(query);
+      // res.send([result]);
     });
 
 
@@ -46,6 +47,24 @@ async function run() {
       console.log(result)
       res.send(result);
     });
+
+  //    // partial search question
+  //    app.get("/search-qna", async (req, res) => {
+  //     try {
+  //         let searchResult;
+  //         if (req.query.searchQuery) {
+  //             const cursor = questionCollection.find({
+  //                 $text: { $search: `\"${req.query.searchQuery}\"` },
+  //             });
+  //             searchResult = await cursor.toArray();
+  //         } else {
+  //             searchResult = await questionCollection.find({}).toArray();
+  //         }
+  //         res.send(searchResult);
+  //     } catch (error) {
+  //         res.status(500).json({ message: "something went wrong!" });
+  //     }
+  // });
     
 //userCollection
 
@@ -66,6 +85,7 @@ async function run() {
 
       res.send(result);
     });
+    // sourav part start here
     app.post("/send-question", async (req, res) => {
       const question = req.body;
       const result = await questionCollection.insertOne(question);
@@ -74,6 +94,30 @@ async function run() {
         message:"Your Question Send Succesfully"
       });
     });
+    app.post("/add-problem", async (req, res) => {
+      const problem = req.body;
+      const result = await problemCollection.insertOne(problem);
+      res.send({
+        data:result,
+        message:"Your Problem added Succesfully"
+      });
+    });
+
+    app.get("/specific-problem/:id", async (req, res) => {
+      const categoryId= req.params.id;
+      const query={categoryId:categoryId}
+     
+      const result= await problemCollection.find(query).toArray()
+              // console.log(sellerProduct)
+      res.send(result)
+    })
+
+    app.get("/check/:id", async(req,res)=>{
+      console.log(req.params.id)
+    })
+
+    
+    // sourav part end here
 
 
 
