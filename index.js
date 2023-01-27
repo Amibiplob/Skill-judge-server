@@ -28,9 +28,9 @@ async function run() {
     // Question
     app.get("/qnasingle/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await questionCollection.findOne(query);
-      res.send([result]);
+      // const query = { _id: ObjectId(id) };
+      // const result = await questionCollection.findOne(query);
+      // res.send([result]);
     });
 
     app.get("/qna", async (req, res) => {
@@ -95,6 +95,7 @@ async function run() {
       res.send(result);
     })
 
+// sourav code start here
 
     app.post("/send-question", async (req, res) => {
       const question = req.body;
@@ -104,6 +105,30 @@ async function run() {
         message: "Your Question Send Succesfully",
       });
     });
+    app.post("/add-problem", async (req, res) => {
+      const problem = req.body;
+      const result = await problemCollection.insertOne(problem);
+      res.send({
+        data:result,
+        message:"Your Problem added Succesfully"
+      });
+    });
+
+    app.get("/specific-problem/:id", async (req, res) => {
+      const categoryId= req.params.id;
+      const query={categoryId:categoryId}
+     
+      const result= await problemCollection.find(query).toArray()
+              // console.log(sellerProduct)
+      res.send(result)
+    })
+
+    app.get("/check/:id", async(req,res)=>{
+      console.log(req.params.id)
+    })
+
+    
+    // sourav part end here
 
     // services
     app.get("/services", async (req, res) => {
