@@ -44,17 +44,17 @@ async function run() {
 
 
     // Compiler
-app.post("/compiler", async (req, res) => {
-  let pyodide = await loadPyodide();
-  let result = await pyodide.runPythonAsync(req.body.code);
+    app.post("/compiler", async (req, res) => {
+      let pyodide = await loadPyodide();
+      let result = await pyodide.runPythonAsync(req.body.code);
 
-  res.json(result);
-});
-
-
+      res.json(result);
+    });
 
 
-   // partial search question
+
+
+    // partial search question
     app.get("/search-qna", async (req, res) => {
       try {
         let searchResult;
@@ -71,23 +71,30 @@ app.post("/compiler", async (req, res) => {
         res.status(500).json({ message: "something went wrong!" });
       }
     });
-    //userCollection
 
-    app.get("/user", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
 
-      const result = await questionCollection.findOne(query);
+    //getUser by email
+    app.get('/user', async (req, res) => {
+      const email = req.query.email;
+      console.log(email);
+      const query = { email: email };
+      const users = await userCollection.find(query).toArray();
+      res.send(users);
+    })
 
-      res.send(result);
-    });
-
-    app.post("/user", async (req, res) => {
+    //Create user
+    app.post('/user', async (req, res) => {
       const user = req.body;
+      const query = { email: user.email };
+      const alreadyExist = await userCollection.findOne(query);
+      if (alreadyExist) {
+        return;
+      }
       const result = await userCollection.insertOne(user);
-
       res.send(result);
-    });
+    })
+
+
     app.post("/send-question", async (req, res) => {
       const question = req.body;
       const result = await questionCollection.insertOne(question);
