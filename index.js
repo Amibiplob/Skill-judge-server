@@ -23,6 +23,7 @@ async function run() {
     const servicesCollection = database.collection("services");
     const paymentsCollection = database.collection("payments");
     const topQuestionsCollection = database.collection("topquestions");
+    const questionsCollection = database.collection("questions");
     const userCollection = database.collection("user");
     // Question
     app.get("/qnasingle/:id", async (req, res) => {
@@ -120,6 +121,19 @@ app.post("/compiler", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await topQuestionsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // questions
+    app.get("/questions", async (req, res) => {
+      const query = {};
+      const result = await questionsCollection.find(query).toArray();
+      res.send(result);
+    });
+    app.get("/questions/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await questionsCollection.find(query).toArray();
       res.send(result);
     });
 
