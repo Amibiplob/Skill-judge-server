@@ -25,6 +25,8 @@ async function run() {
     const topQuestionsCollection = database.collection("topquestions");
     const questionsCollection = database.collection("question");
     const userCollection = database.collection("user");
+    const quizCollection = database.collection("quiz");
+    const totalQuizCollection = database.collection("totalQuiz");
     // Question
     app.get("/qnasingle/:id", async (req, res) => {
       const id = req.params.id;
@@ -40,6 +42,28 @@ async function run() {
       console.log(result);
       res.send(result);
     });
+
+// quiz
+    app.get("/quiz", async (req, res) => {
+      const query = {};
+      const cursor = quizCollection.find(query);
+      const result = await cursor.toArray();
+
+      res.send(result);
+    });
+
+
+ app.get("/quiz/:name", async (req, res) => {
+   const name = req.params.name;
+   const query = { name: name };
+   const result = await totalQuizCollection.find(query).toArray();
+   res.send(result);
+ });
+
+
+
+
+
 
 
 
