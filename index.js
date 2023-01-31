@@ -25,6 +25,7 @@ async function run() {
         const paymentsCollection = database.collection("payments");
         const topQuestionsCollection = database.collection("topquestions");
         const userCollection = database.collection("user");
+        const quizCollection = database.collection("totalQuiz");
 
         app.get("/qnasingle/:id", async (req, res) => {
             const id = req.params.id;
@@ -99,12 +100,12 @@ async function run() {
         });
 
         // top-questions
-        app.get("/topquestions", async (req, res) => {
+        app.get("/top-questions", async (req, res) => {
             const query = {};
             const result = await topQuestionsCollection.find(query).toArray();
             res.send(result);
         });
-        app.get("/topquestions/:id", async (req, res) => {
+        app.get("/top-questions/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await topQuestionsCollection.find(query).toArray();
@@ -150,6 +151,14 @@ async function run() {
 
             res.send(result);
         });
+
+        // total quiz
+        app.get("/total-quiz", async (req, res) => {
+            const query = {};
+            const result = await quizCollection.find(query).toArray();
+            res.send(result);
+        });
+
     } finally {
     }
 }
