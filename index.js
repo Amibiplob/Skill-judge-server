@@ -154,11 +154,25 @@ async function run() {
 
         // total quiz
         app.get("/total-quiz", async (req, res) => {
-            const query = {};
-            const result = await quizCollection.find(query).toArray();
-            res.send(result);
+            try {
+                const query = {};
+                const result = await quizCollection.find(query).toArray();
+                res.send(result);
+            } catch (error) {
+                res.status(500).json(error.message);
+            }
         });
 
+        // insert new quiz
+        app.post("/quizs", async (req, res) => {
+            try {
+                const quizs = req.body;
+                const result = await questionCollection.insertOne(quizs);
+                req.json(result);
+            } catch (error) {
+                res.status(500).json(error.message);
+            }
+        });
     } finally {
     }
 }
