@@ -30,9 +30,9 @@ async function run() {
     // Question
     app.get("/qnasingle/:id", async (req, res) => {
       const id = req.params.id;
-      // const query = { _id: ObjectId(id) };
-      // const result = await questionCollection.findOne(query);
-      // res.send([result]);
+      const query = { _id: ObjectId(id) };
+      const result = await questionCollection.findOne(query);
+      res.send([result]);
     });
 
     app.get("/qna", async (req, res) => {
@@ -61,7 +61,23 @@ async function run() {
  });
 
 
+    app.post("/quiz", async (req, res) => {
+      const addQuiz = req.body;
+      const result = await quizCollection.insertOne(addQuiz);
+      res.send(result);
+    });
 
+    app.delete("/quiz", async (req, res) => {
+      const id = req.query.id;
+      const query = { _id: ObjectId(id) };
+      const result = await quizCollection.deleteOne(query);
+      console.log(result);
+      if (result.deletedCount === 1) {
+        res.send("Successfully deleted one document.");
+      } else {
+        res.send("No documents matched the query. Deleted 0 documents.");
+      }
+    });
 
 
 
