@@ -1,10 +1,20 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
+const corsOptions = {
+	origin: "http://localhost:3000",
+};
 const app = express();
 require("dotenv").config();
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use((req, res, next) => {
+	res.header({
+		"Access-Control-Allow-Origin": "*",
+		"Access-Control-Allow-Credentials": true,
+	});
+	next();
+}); 
 const port = process.env.PORT || 5000;
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { loadPyodide } = require("pyodide");
@@ -62,9 +72,9 @@ async function run() {
 // saved quiz/srabon
 	app.post("/savedquiz", async (req, res) => {
 		const saved = req.body;
-		const result = await Collection.insertOne(saved);
-		res.send(result);
-		console.log(user);
+		const result = await quizSavedCollection.insertOne(saved);
+		res.json(result);
+		console.log(saved);
   });
 
 
@@ -253,9 +263,6 @@ async function run() {
 
 run().catch(console.dir);
 
-app.get("/", (req, res) => {
-	res.send("server is working");
-});
 
 app.listen(port, () => {
 	console.log("server is working", port);
