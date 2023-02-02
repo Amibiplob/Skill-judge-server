@@ -59,13 +59,33 @@ async function run() {
 			const result = await totalQuizCollection.find(query).toArray();
 			res.send(result);
 		});
-// saved quiz
+// saved quiz/srabon
 	app.post("/savedquiz", async (req, res) => {
-		const user = req.body;
-		const result = await Collection.insertOne(user);
+		const saved = req.body;
+		const result = await Collection.insertOne(saved);
 		res.send(result);
 		console.log(user);
   });
+
+
+    app.post("/quiz", async (req, res) => {
+      const addQuiz = req.body;
+      const result = await quizCollection.insertOne(addQuiz);
+      res.send(result);
+    });
+
+    app.delete("/quiz", async (req, res) => {
+      const id = req.query.id;
+      const query = { _id: ObjectId(id) };
+      const result = await quizCollection.deleteOne(query);
+      console.log(result);
+      if (result.deletedCount === 1) {
+        res.send("Successfully deleted one document.");
+      } else {
+        res.send("No documents matched the query. Deleted 0 documents.");
+      }
+    });
+
     
 		// Compiler
 		http: app.post("/compiler", async (req, res) => {
