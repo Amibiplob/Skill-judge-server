@@ -145,7 +145,7 @@ async function run() {
             res.send(result);
         })
 
-        //update users info
+        //update users information
         app.put('/updateUser', async (req, res) => {
             const userEmail = req.query.email;
             // console.log(userEmail);
