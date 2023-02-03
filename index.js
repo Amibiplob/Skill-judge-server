@@ -126,16 +126,15 @@ async function run() {
         });
 
         //getUser by email
-        app.get("/user", async (req, res) => {
+        app.get('/user', async (req, res) => {
             const email = req.query.email;
-            console.log(email);
             const query = { email: email };
             const users = await userCollection.find(query).toArray();
             res.send(users);
-        });
+        })
 
         //Create user
-        app.post("/user", async (req, res) => {
+        app.post('/user', async (req, res) => {
             const user = req.body;
             const query = { email: user.email };
             const alreadyExist = await userCollection.findOne(query);
@@ -144,8 +143,30 @@ async function run() {
             }
             const result = await userCollection.insertOne(user);
             res.send(result);
-            console.log(user);
-        });
+        })
+
+        //update users info
+        app.put('/updateUser', async (req, res) => {
+            const userEmail = req.query.email;
+            // console.log(userEmail);
+            const data = req.body;
+            const { name, email, mobile, occupation, address, photo } = data;
+            // console.log(data);
+            const filter = { email: userEmail }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    name,
+                    email,
+                    occupation,
+                    mobile,
+                    address,
+                    photo
+                }
+            };
+            const result = await userCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        })
 
 
 
@@ -501,38 +522,38 @@ async function run() {
                     //     .toArray();
                     const b = await questionCollection.aggregate([
                         {
-                          $lookup:{
-                            "from": "topquestions",
-                            "localField": "question",
-                            "foreignField": "question",
-                            "as": "top-question",
-                            "pipeline": [{
-                              "$search": {
-                                "compound": {
-                                  "must": [{
-                                    "queryString": {
-                                      "defaultPath": "question",
-                                      "query": req.query.searchKeyword
+                            $lookup: {
+                                "from": "topquestions",
+                                "localField": "question",
+                                "foreignField": "question",
+                                "as": "top-question",
+                                "pipeline": [{
+                                    "$search": {
+                                        "compound": {
+                                            "must": [{
+                                                "queryString": {
+                                                    "defaultPath": "question",
+                                                    "query": req.query.searchKeyword
+                                                }
+                                            }],
+                                        }
                                     }
-                                  }],
-                                }
-                              }
-                            },{
-                              "$project": {
-                                "_id": 0
-                              }
-                            }]
-                          }
-                        },{
-                          "$limit": 5
-                        },{
-                          "$project": {
-                            "_id": 1,
-                            "question":1
-                            
-                          }
+                                }, {
+                                    "$project": {
+                                        "_id": 0
+                                    }
+                                }]
+                            }
+                        }, {
+                            "$limit": 5
+                        }, {
+                            "$project": {
+                                "_id": 1,
+                                "question": 1
+
+                            }
                         }
-                      ])
+                    ])
                     res.json(b);
                 }
             } catch (error) {
