@@ -87,10 +87,10 @@ async function run() {
 			res.send({ ...result, ...req.body });
 		});
 		// srabon/edit qna
-		app.put('/editqna/:id', async (req, res) => {
+		app.put("/editqna/:id", async (req, res) => {
 			const id = req.params.id;
 			const filter = { _id: ObjectId(id) };
-			const query = req.body.question
+			const query = req.body.question;
 			const options = { upsert: true };
 			const updateDoc = {
 				$set: {
@@ -102,212 +102,273 @@ async function run() {
 				updateDoc,
 				options
 			);
-			res.send(result)
+			res.send(result);
 			console.log(query);
-		})
+		});
 
-			// quiz
-			app.get("/quiz", async (req, res) => {
-				const query = {};
-				const cursor = quizCollection.find(query);
-				const result = await cursor.toArray();
+		/*---- Afzal working here ----*/
+		// Get All users
+		app.get("/all-users", async (req, res) => {
+			const query = {};
+			const allUsers = await userCollection.find(query).toArray();
+			res.send(allUsers);
+		});
+		// Delete user
+		app.delete("/user/:id", async (req, res) => {
+			const id = req.params.id;
+			const filter = { _id: ObjectId(id) };
+			const user = await userCollection.deleteOne(filter);
+			res.send(user);
+		});
+		//getUser by email
+		app.get("/user", async (req, res) => {
+			const email = req.query.email;
+			const query = { email: email };
+			const users = await userCollection.find(query).toArray();
+			res.send(users);
+		});
 
-				res.send(result);
-			});
+		//Create user
+		app.post("/user", async (req, res) => {
+			const user = req.body;
+			const query = { email: user.email };
+			const alreadyExist = await userCollection.findOne(query);
+			if (alreadyExist) {
+				return;
+			}
+			const result = await userCollection.insertOne(user);
+			res.send(result);
+		});
 
-			app.get("/quiz/:name", async (req, res) => {
-				const name = req.params.name;
-				const query = { name: name };
-				const result = await totalQuizCollection.find(query).toArray();
-				res.send(result);
-			});
-			// saved quiz/srabon
-			app.post("/savedquiz", async (req, res) => {
-				const saved = req.body;
-				const result = await quizSavedCollection.insertOne(saved);
-				res.json(result);
-				// console.log(saved);
-			});
+		//update users information
+		app.put("/updateUser", async (req, res) => {
+			const userEmail = req.query.email;
+			// console.log(userEmail);
+			const data = req.body;
+			const { name, email, mobile, occupation, address, photo } = data;
+			// console.log(data);
+			const filter = { email: userEmail };
+			const options = { upsert: true };
+			const updatedDoc = {
+				$set: {
+					name,
+					email,
+					occupation,
+					mobile,
+					address,
+					photo,
+				},
+			};
+			const result = await userCollection.updateOne(
+				filter,
+				updatedDoc,
+				options
+			);
+			res.send(result);
+		});
 
-			app.post("/quiz", async (req, res) => {
-				const addQuiz = req.body;
-				const result = await quizCollection.insertOne(addQuiz);
-				res.send(result);
-			});
+		// quiz
+		app.get("/quiz", async (req, res) => {
+			const query = {};
+			const cursor = quizCollection.find(query);
+			const result = await cursor.toArray();
 
-			app.delete("/quiz", async (req, res) => {
-				const id = req.query.id;
-				const query = { _id: ObjectId(id) };
-				const result = await quizCollection.deleteOne(query);
-				console.log(result);
-				if (result.deletedCount === 1) {
-					res.send("Successfully deleted one document.");
+			res.send(result);
+		});
+
+		app.get("/quiz/:name", async (req, res) => {
+			const name = req.params.name;
+			const query = { name: name };
+			const result = await totalQuizCollection.find(query).toArray();
+			res.send(result);
+		});
+		// saved quiz/srabon
+		app.post("/savedquiz", async (req, res) => {
+			const saved = req.body;
+			const result = await quizSavedCollection.insertOne(saved);
+			res.json(result);
+			// console.log(saved);
+		});
+
+		app.post("/quiz", async (req, res) => {
+			const addQuiz = req.body;
+			const result = await quizCollection.insertOne(addQuiz);
+			res.send(result);
+		});
+
+		app.delete("/quiz", async (req, res) => {
+			const id = req.query.id;
+			const query = { _id: ObjectId(id) };
+			const result = await quizCollection.deleteOne(query);
+			console.log(result);
+			if (result.deletedCount === 1) {
+				res.send("Successfully deleted one document.");
+			} else {
+				res.send("No documents matched the query. Deleted 0 documents.");
+			}
+		});
+
+		// Compiler
+		http: app.post("/compiler", async (req, res) => {
+			let pyodide = await loadPyodide();
+			let result = await pyodide.runPythonAsync(req.body.code);
+
+			res.json(result);
+		});
+
+		// partial search question
+		app.get("/search-qna", async (req, res) => {
+			try {
+				let searchResult;
+				if (req.query.searchQuery) {
+					const cursor = questionCollection.find({
+						$text: { $search: `\"${req.query.searchQuery}\"` },
+					});
+					searchResult = await cursor.toArray();
 				} else {
-					res.send("No documents matched the query. Deleted 0 documents.");
+					searchResult = await questionCollection.find({}).toArray();
 				}
+				res.send(searchResult);
+			} catch (error) {
+				res.status(500).json({ message: "something went wrong!" });
+			}
+		});
+
+		//getUser by email
+		app.get("/user", async (req, res) => {
+			const email = req.query.email;
+			console.log(email);
+			const query = { email: email };
+			const users = await userCollection.find(query).toArray();
+			res.send(users);
+		});
+
+		//Create user
+		app.post("/user", async (req, res) => {
+			const user = req.body;
+			const query = { email: user.email };
+			const alreadyExist = await userCollection.findOne(query);
+			if (alreadyExist) {
+				return;
+			}
+			const result = await userCollection.insertOne(user);
+			res.send(result);
+			// console.log(user);
+		});
+
+		// sourav code start here
+
+		app.post("/send-question", async (req, res) => {
+			const question = req.body;
+			const result = await questionCollection.insertOne(question);
+			res.send({
+				data: result,
+				message: "Your Question Send Succesfully",
 			});
-
-			// Compiler
-			http: app.post("/compiler", async (req, res) => {
-				let pyodide = await loadPyodide();
-				let result = await pyodide.runPythonAsync(req.body.code);
-
-				res.json(result);
+		});
+		app.post("/add-problem", async (req, res) => {
+			const problem = req.body;
+			const result = await problemCollection.insertOne(problem);
+			res.send({
+				data: result,
+				message: "Your Problem added Succesfully",
 			});
+		});
 
-			// partial search question
-			app.get("/search-qna", async (req, res) => {
-				try {
-					let searchResult;
-					if (req.query.searchQuery) {
-						const cursor = questionCollection.find({
-							$text: { $search: `\"${req.query.searchQuery}\"` },
-						});
-						searchResult = await cursor.toArray();
-					} else {
-						searchResult = await questionCollection.find({}).toArray();
-					}
-					res.send(searchResult);
-				} catch (error) {
-					res.status(500).json({ message: "something went wrong!" });
-				}
+		app.get("/specific-problem/:id", async (req, res) => {
+			const categoryId = req.params.id;
+			const query = { categoryId: categoryId };
+
+			const result = await problemCollection.find(query).toArray();
+			// console.log(sellerProduct)
+			res.send(result);
+		});
+
+		app.get("/check/:id", async (req, res) => {
+			// console.log(req.params.id);
+		});
+
+		// sourav part end here
+
+		// services
+		app.get("/services", async (req, res) => {
+			const query = {};
+			const result = await servicesCollection.find(query).toArray();
+			res.send(result);
+		});
+		app.get("/book/:id", async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: ObjectId(id) };
+			const result = await servicesCollection.find(query).toArray();
+			res.send(result);
+		});
+
+		// top-questions
+		app.get("/top-questions", async (req, res) => {
+			const query = {};
+			const result = await topQuestionsCollection.find(query).toArray();
+			res.send(result);
+		});
+		app.get("/top-questions/:id", async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: ObjectId(id) };
+			const result = await topQuestionsCollection.find(query).toArray();
+			res.send(result);
+		});
+
+		// questions
+		app.get("/questions", async (req, res) => {
+			const query = {};
+			const result = await questionsCollection.find(query).toArray();
+			res.send(result);
+		});
+		app.get("/questions/:id", async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: ObjectId(id) };
+			const result = await questionsCollection.find(query).toArray();
+			res.send(result);
+		});
+
+		// payments
+		app.post("/create-payment-intent", async (req, res) => {
+			const payment = req.body;
+			const price = payment.price;
+			const amount = parseFloat(price * 100);
+			const paymentIntent = await stripe.paymentIntents.create({
+				currency: "usd",
+				amount: amount,
+				payment_method_types: ["card"],
 			});
-
-			//getUser by email
-			app.get("/user", async (req, res) => {
-				const email = req.query.email;
-				console.log(email);
-				const query = { email: email };
-				const users = await userCollection.find(query).toArray();
-				res.send(users);
+			res.send({
+				clientSecret: paymentIntent.client_secret,
 			});
+		});
 
-			//Create user
-			app.post("/user", async (req, res) => {
-				const user = req.body;
-				const query = { email: user.email };
-				const alreadyExist = await userCollection.findOne(query);
-				if (alreadyExist) {
-					return;
-				}
-				const result = await userCollection.insertOne(user);
-				res.send(result);
-				// console.log(user);
-			});
+		app.post("/payments", async (req, res) => {
+			const payments = req.body;
+			const result = await paymentsCollection.insertOne(payments);
+			const id = payments.paymentId;
+			const filter = { _id: ObjectId(id) };
+			const updateDos = {
+				$set: {
+					paid: true,
+					transactionId: payments.transactionId,
+				},
+			};
+			const updateResult = await servicesCollection.updateOne(
+				filter,
+				updateDos
+			);
+			res.send({ updateResult, update });
+		});
 
-			// sourav code start here
+		app.post("/qna", async (req, res) => {
+			const qna = req.body;
+			const result = await questionCollection.insertOne(qna);
 
-			app.post("/send-question", async (req, res) => {
-				const question = req.body;
-				const result = await questionCollection.insertOne(question);
-				res.send({
-					data: result,
-					message: "Your Question Send Succesfully",
-				});
-			});
-			app.post("/add-problem", async (req, res) => {
-				const problem = req.body;
-				const result = await problemCollection.insertOne(problem);
-				res.send({
-					data: result,
-					message: "Your Problem added Succesfully",
-				});
-			});
-
-			app.get("/specific-problem/:id", async (req, res) => {
-				const categoryId = req.params.id;
-				const query = { categoryId: categoryId };
-
-				const result = await problemCollection.find(query).toArray();
-				// console.log(sellerProduct)
-				res.send(result);
-			});
-
-			app.get("/check/:id", async (req, res) => {
-				// console.log(req.params.id);
-			});
-
-			// sourav part end here
-
-			// services
-			app.get("/services", async (req, res) => {
-				const query = {};
-				const result = await servicesCollection.find(query).toArray();
-				res.send(result);
-			});
-			app.get("/book/:id", async (req, res) => {
-				const id = req.params.id;
-				const query = { _id: ObjectId(id) };
-				const result = await servicesCollection.find(query).toArray();
-				res.send(result);
-			});
-
-			// top-questions
-			app.get("/top-questions", async (req, res) => {
-				const query = {};
-				const result = await topQuestionsCollection.find(query).toArray();
-				res.send(result);
-			});
-			app.get("/top-questions/:id", async (req, res) => {
-				const id = req.params.id;
-				const query = { _id: ObjectId(id) };
-				const result = await topQuestionsCollection.find(query).toArray();
-				res.send(result);
-			});
-
-			// questions
-			app.get("/questions", async (req, res) => {
-				const query = {};
-				const result = await questionsCollection.find(query).toArray();
-				res.send(result);
-			});
-			app.get("/questions/:id", async (req, res) => {
-				const id = req.params.id;
-				const query = { _id: ObjectId(id) };
-				const result = await questionsCollection.find(query).toArray();
-				res.send(result);
-			});
-
-			// payments
-			app.post("/create-payment-intent", async (req, res) => {
-				const payment = req.body;
-				const price = payment.price;
-				const amount = parseFloat(price * 100);
-				const paymentIntent = await stripe.paymentIntents.create({
-					currency: "usd",
-					amount: amount,
-					payment_method_types: ["card"],
-				});
-				res.send({
-					clientSecret: paymentIntent.client_secret,
-				});
-			});
-
-			app.post("/payments", async (req, res) => {
-				const payments = req.body;
-				const result = await paymentsCollection.insertOne(payments);
-				const id = payments.paymentId;
-				const filter = { _id: ObjectId(id) };
-				const updateDos = {
-					$set: {
-						paid: true,
-						transactionId: payments.transactionId,
-					},
-				};
-				const updateResult = await servicesCollection.updateOne(
-					filter,
-					updateDos
-				);
-				res.send({ updateResult, update });
-			});
-
-			app.post("/qna", async (req, res) => {
-				const qna = req.body;
-				const result = await questionCollection.insertOne(qna);
-
-				res.send(result);
-			})
-		} finally {
+			res.send(result);
+		});
+	} finally {
 		}
 	}
 
