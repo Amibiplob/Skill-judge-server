@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
+const searchAll = require("./lib/search-all");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -168,7 +169,86 @@ async function run() {
             try {
                 const quizs = req.body;
                 const result = await questionCollection.insertOne(quizs);
-                req.json(result);
+                res.json(result);
+            } catch (error) {
+                res.status(500).json(error.message);
+            }
+        });
+
+        // search entire collection result
+        app.get("/search-all", async (req, res) => {
+            try {
+                if (req.query.searchKeyword) {
+                    database.companies.aggregate([
+                        {
+                            $search: {
+                                text: {
+                                    query: "Mobile",
+                                    path: "name",
+                                },
+                            },
+                        },
+                        {
+                            $project: {
+                                score: {
+                                    $meta: "searchScore",
+                                },
+                                _id: 0,
+                                number_of_employees: 1,
+                                founded_year: 1,
+                                name: 1,
+                            },
+                        },
+                        {
+                            $set: {
+                                source: "companies",
+                            },
+                        },
+                        {
+                            $limit: 3,
+                        },
+                        {
+                            $unionWith: {
+                                coll: "inspections",
+                                pipeline: [
+                                    {
+                                        $search: {
+                                            text: {
+                                                query: "Mobile",
+                                                path: "business_name",
+                                            },
+                                        },
+                                    },
+                                    {
+                                        $set: {
+                                            source: "inspections",
+                                        },
+                                    },
+                                    {
+                                        $project: {
+                                            score: {
+                                                $meta: "searchScore",
+                                            },
+                                            source: 1,
+                                            _id: 0,
+                                            business_name: 1,
+                                            address: 1,
+                                        },
+                                    },
+                                    {
+                                        $limit: 3,
+                                    },
+                                    {
+                                        $sort: {
+                                            score: -1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ]);
+                    res.json(result);
+                }
             } catch (error) {
                 res.status(500).json(error.message);
             }
