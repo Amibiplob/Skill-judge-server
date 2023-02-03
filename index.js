@@ -76,7 +76,6 @@ async function run() {
     //getUser by email
     app.get('/user', async (req, res) => {
       const email = req.query.email;
-      console.log(email);
       const query = { email: email };
       const users = await userCollection.find(query).toArray();
       res.send(users);
@@ -91,6 +90,29 @@ async function run() {
         return;
       }
       const result = await userCollection.insertOne(user);
+      res.send(result);
+    })
+
+    //update users info
+    app.put('/updateUser', async (req, res) => {
+      const userEmail = req.query.email;
+      console.log(userEmail);
+      const data = req.body;
+      const { name, email, mobile, occupation, address, photo } = data;
+      // console.log(data);
+      const filter = { email: userEmail }
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          name,
+          email,
+          occupation,
+          mobile,
+          address,
+          photo
+        }
+      };
+      const result = await userCollection.updateOne(filter, updatedDoc, options);
       res.send(result);
     })
 
