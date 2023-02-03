@@ -43,7 +43,7 @@ async function run() {
       res.send(result);
     });
 
-// quiz
+    // quiz
     app.get("/quiz", async (req, res) => {
       const query = {};
       const cursor = quizCollection.find(query);
@@ -53,31 +53,19 @@ async function run() {
     });
 
 
- app.get("/quiz/:name", async (req, res) => {
-   const name = req.params.name;
-   const query = { name: name };
-   const result = await totalQuizCollection.find(query).toArray();
-   res.send(result);
- });
-
-
-
-
-
-
-
-
+    app.get("/quiz/:name", async (req, res) => {
+     const name = req.params.name;
+     const query = { name: name };
+     const result = await totalQuizCollection.find(query).toArray();
+     res.send(result);
+    }) 
 
     // Compiler
     app.post("/compiler", async (req, res) => {
       let pyodide = await loadPyodide();
-      let result = await pyodide.runPythonAsync(req.body.code);
-
+      let result = await pyodide.runPythonAsync(req.body.code); 
       res.json(result);
-    });
-
-
-
+    });  
 
     // partial search question
     app.get("/search-qna", async (req, res) => {
@@ -98,7 +86,7 @@ async function run() {
     });
 
 
-    //getUser by email
+    //GetUser by email
     app.get('/user', async (req, res) => {
       const email = req.query.email;
       console.log(email);
@@ -107,20 +95,34 @@ async function run() {
       res.send(users);
     })
 
+    /*---- Afzal working here ----*/ 
+    // Get All users
+    app.get('/all-users', async(req, res) => {
+      const query = {}
+      const allUsers = await userCollection.find(query).toArray();
+      res.send(allUsers)
+    })
+    // Delete user
+    app.delete('/user/:id', async (req, res) => {
+      const id = req.params.id
+      const filter = {_id: ObjectId(id)} 
+      const user = await userCollection.deleteOne(filter)
+      res.send(user)
+    })
+
     //Create user
     app.post('/user', async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
       const alreadyExist = await userCollection.findOne(query);
-      if (alreadyExist) {
-        return;
+      if(alreadyExist){
+         return;
       }
       const result = await userCollection.insertOne(user);
       res.send(result);
     })
 
-// sourav code start here
-
+    // sourav code start here 
     app.post("/send-question", async (req, res) => {
       const question = req.body;
       const result = await questionCollection.insertOne(question);
@@ -143,7 +145,7 @@ async function run() {
       const query={categoryId:categoryId}
      
       const result= await problemCollection.find(query).toArray()
-              // console.log(sellerProduct)
+      // console.log(sellerProduct)
       res.send(result)
     })
 
@@ -232,7 +234,7 @@ async function run() {
 
       res.send(result);
     });
-  } finally {
+   } finally {
   }
 }
 
