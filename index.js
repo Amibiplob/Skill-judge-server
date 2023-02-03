@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
 const corsOptions = {
-	origin: "http://localhost:3000",
+    origin: "http://localhost:3000",
 };
 const app = express();
 require("dotenv").config();
@@ -21,9 +21,9 @@ const { loadPyodide } = require("pyodide");
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@skill-judge.old6dyc.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
-	serverApi: ServerApiVersion.v1,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverApi: ServerApiVersion.v1,
 });
 
 async function run() {
@@ -316,5 +316,5 @@ app.get("/", async (req, res) => {
 	res.send("server is running");
 });
 app.listen(port, () => {
-	console.log("server is working", port);
+    console.log("server is working", port);
 });
