@@ -1,12 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
-const corsOptions = {
-    origin: "http://localhost:3000",
-};
+
 const app = express();
 require("dotenv").config();
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
 	res.header({
