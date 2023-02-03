@@ -243,12 +243,12 @@ async function run() {
 			});
 
 			// top-questions
-			app.get("/topquestions", async (req, res) => {
+			app.get("/top-questions", async (req, res) => {
 				const query = {};
 				const result = await topQuestionsCollection.find(query).toArray();
 				res.send(result);
 			});
-			app.get("/topquestions/:id", async (req, res) => {
+			app.get("/top-questions/:id", async (req, res) => {
 				const id = req.params.id;
 				const query = { _id: ObjectId(id) };
 				const result = await topQuestionsCollection.find(query).toArray();
