@@ -4,7 +4,12 @@ const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
 
 const app = express();
 require("dotenv").config();
-app.use(cors());
+const corsOptions = {
+	origin: "http://localhost:3000",
+	credentials: true, //access-control-allow-credentials:true
+	optionSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 const port = process.env.PORT || 5000;
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
