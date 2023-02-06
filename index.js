@@ -31,6 +31,7 @@ async function run() {
 		const totalQuizCollection = database.collection("totalQuiz");
 		const quizSavedCollection = database.collection("quizSaved");
 		const commentsCollection = database.collection("QnaComments");
+		const teamCollection = database.collection("team-member");
 		// Question
 		app.get("/qnasingle/:id", async (req, res) => {
 			const id = req.params.id;
@@ -46,6 +47,13 @@ async function run() {
 			// console.log(result);
 			res.send(result);
 		});
+		// team-member-api
+		app.get("/team", async (req, res) => {
+			const query = {};
+			const result = await teamCollection.find(query).toArray();
+			res.send(result)
+		})
+
 		// qna-comment/srabon
 		app.post("/comment", async (req, res) => {
 			const comments = req.body;
