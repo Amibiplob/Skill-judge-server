@@ -18,6 +18,19 @@ const client = new MongoClient(uri, {
     serverApi: ServerApiVersion.v1,
 });
 
+
+////////////////
+
+
+
+const blog = require("./blog");
+
+
+
+////////////////////
+
+
+
 async function run() {
 	try {
 		const database = client.db("Skill-judge");
@@ -32,6 +45,21 @@ async function run() {
 		const quizSavedCollection = database.collection("quizSaved");
 		const commentsCollection = database.collection("QnaComments");
 		const teamCollection = database.collection("team-member");
+
+
+
+
+////////////////////////////
+
+
+app.use("/blog", blog);
+
+//////////////////////////
+
+
+
+
+
 		// Question
 		app.get("/qnasingle/:id", async (req, res) => {
 			const id = req.params.id;
