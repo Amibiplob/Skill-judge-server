@@ -45,6 +45,7 @@ async function run() {
 		const quizSavedCollection = database.collection("quizSaved");
 		const commentsCollection = database.collection("QnaComments");
 		const teamCollection = database.collection("team-member");
+		const problemsCollection = database.collection("problems");
 
 
 
@@ -132,6 +133,18 @@ app.use("/blog", blog);
 			);
 			res.send(result);
 			console.log(query);
+		});
+		// srabon problem
+		app.get("/problems", async (req, res) => {
+			const query = {};
+			const result = await problemsCollection.find(query).toArray();
+			res.send(result);
+		});
+		app.get("/problems/:id", async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: ObjectId(id) };
+			const result = await problemsCollection.find(query).toArray();
+			res.send(result);
 		});
 
 		/*---- Afzal working here ----*/
