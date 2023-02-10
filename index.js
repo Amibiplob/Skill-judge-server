@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 5000;
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const { loadPyodide } = require("pyodide");
+
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@skill-judge.old6dyc.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -19,9 +19,14 @@ const client = new MongoClient(uri, {
 });
 
 
-//////////////// 
+////////////////
 
-const blog = require("./blog"); 
+
+
+const blog = require("./blog");
+const compiler = require("./compiler");
+
+
 
 ////////////////////
 
@@ -50,6 +55,8 @@ async function run() {
 
 
 app.use("/blog", blog);
+app.use("/compiler", compiler);
+
 
 //////////////////////////
 
@@ -212,13 +219,6 @@ app.use("/blog", blog);
 
 			res.send(result);
 		});
-		// Saved quiz
-		app.get('/savedQuiz', async (req, res) => {
-			const email = req.query.email
-			const savedquiz = {email: email}
-			const result = await quizSavedCollection.find(savedquiz).toArray()
-			res.send(result) 
-		})
 
 		app.get("/quiz/:name", async (req, res) => {
 			const name = req.params.name;
@@ -253,12 +253,7 @@ app.use("/blog", blog);
 		});
 
 		// Compiler
-		http: app.post("/compiler", async (req, res) => {
-			let pyodide = await loadPyodide();
-			let result = await pyodide.runPythonAsync(req.body.code);
-
-			res.json(result);
-		});
+	
 
 		// partial search question
 		app.get("/search-qna", async (req, res) => {

@@ -1,6 +1,6 @@
 const express = require("express");
 
-const user = express.Router();
+const jwt = express.Router();
 const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@skill-judge.old6dyc.mongodb.net/?retryWrites=true&w=majority`;
@@ -25,6 +25,8 @@ async function run() {
 
 
 
+
+
     
   } finally {
   }
@@ -33,4 +35,4 @@ run().catch(console.dir);
 
 /////////END////////////
 
-module.exports = user;
+module.exports = jwt;
