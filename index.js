@@ -13,9 +13,9 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@skill-judge.old6dyc.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverApi: ServerApiVersion.v1,
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	serverApi: ServerApiVersion.v1,
 });
 
 
@@ -51,16 +51,14 @@ async function run() {
 
 
 
-////////////////////////////
+		////////////////////////////
 
 
-app.use("/blog", blog);
-app.use("/compiler", compiler);
+		app.use("/blog", blog);
+		app.use("/compiler", compiler);
 
 
-//////////////////////////
-
-
+		//////////////////////////
 
 
 
@@ -253,7 +251,7 @@ app.use("/compiler", compiler);
 		});
 
 		// Compiler
-	
+
 
 		// partial search question
 		app.get("/search-qna", async (req, res) => {
@@ -408,13 +406,13 @@ app.use("/compiler", compiler);
 			res.send(result);
 		});
 	} finally {
-		}
 	}
+}
 
 run().catch(console.dir);
 app.get("/", async (req, res) => {
 	res.send("Server is running");
 });
 app.listen(port, () => {
-    console.log("Server is working", port);
+	console.log("Server is working", port);
 });
