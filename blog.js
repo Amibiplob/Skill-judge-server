@@ -39,6 +39,32 @@ async function run() {
 
 
     
+	blog.patch("/comment", async (req, res) => {
+    const comment = req.body;
+    // create a filter for a movie to update
+    const filter = { _id:ObjectId(comment.id) };
+    // this option instructs the method to create a document if no documents match the filter
+    const options = { upsert: true };
+    // create a document that sets the plot of the movie
+
+   const oldComment = await blogCollection.findOne(filter);
+
+  const updateDoc = {
+    $set: {
+      comment: [...oldComment.comment,
+        {
+        comment: comment.comment,
+        name: comment.name,
+      }],
+    },
+  };
+    const result = await blogCollection.updateOne(filter, updateDoc, options);
+    console.log(result);
+       res.send(result);
+  });
+
+
+    
   } finally {
   }
 }
