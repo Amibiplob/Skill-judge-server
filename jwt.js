@@ -1,5 +1,6 @@
 const express = require("express");
 
+const jsonWebToken = require('jsonwebtoken');
 const jwt = express.Router();
 const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
 
@@ -16,6 +17,18 @@ async function run() {
     const database = client.db("Skill-judge");
     const userCollection = database.collection("user");
 
+    //Generate a jwt token
+    jwt.get('/', async (req, res) => {
+      const email = req.query.email;
+      console.log(email);
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      if (user) {
+        const token = jsonWebToken.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '7d' });
+        return res.send({ accessToken: token })
+      }
+      res.status(403).send({ accessToken: '' })
+    })
 
 
 
@@ -27,7 +40,6 @@ async function run() {
 
 
 
-    
   } finally {
   }
 }

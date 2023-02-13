@@ -4,6 +4,8 @@ import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 
 const app = express();
 require("dotenv").config();
+const jsonWebToken = require('jsonwebtoken');
+
 
 app.use(cors());
 app.use(json());
@@ -13,9 +15,9 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@skill-judge.old6dyc.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverApi: ServerApiVersion.v1,
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	serverApi: ServerApiVersion.v1,
 });
 
 
@@ -51,14 +53,34 @@ async function run() {
 
 
 
-////////////////////////////
+		////////////////////////////
 
 
-app.use("/blog", blog);
-app.use("/compiler", compiler);
+		app.use("/blog", blog);
+		app.use("/compiler", compiler);
+		app.use("/jwt", jwt);
 
 
-//////////////////////////
+		//////////////////////////
+
+
+		// Function for verify jwt
+		function verifyJWT(req, res, next) {
+			const authHeader = req.headers.authorization;
+			if (!authHeader) {
+				return res.status(401).send('unauthorized access');
+			}
+			const token = authHeader.split(' ')[1];
+
+			jsonWebToken.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+				if (err) {
+					return res.status(403).send({ message: 'forbidden access' });
+				}
+				req.decoded = decoded;
+				next();
+			})
+		}
+
 
 
 
@@ -164,8 +186,9 @@ app.use("/compiler", compiler);
 			const user = await userCollection.deleteOne(filter);
 			res.send(user);
 		});
+
 		//getUser by email
-		app.get("/user", async (req, res) => {
+		app.get("/user", verifyJWT, async (req, res) => {
 			const email = req.query.email;
 			const query = { email: email };
 			const users = await userCollection.find(query).toArray();
@@ -178,6 +201,7 @@ app.use("/compiler", compiler);
 			const query = { email: user.email };
 			const alreadyExist = await userCollection.findOne(query);
 			if (alreadyExist) {
+				res.send(JSON.stringify({ message: "User already exists" }));
 				return;
 			}
 			const result = await userCollection.insertOne(user);
@@ -253,7 +277,7 @@ app.use("/compiler", compiler);
 		});
 
 		// Compiler
-	
+
 
 		// partial search question
 		app.get("/search-qna", async (req, res) => {
@@ -408,13 +432,13 @@ app.use("/compiler", compiler);
 			res.send(result);
 		});
 	} finally {
-		}
 	}
+}
 
 run().catch(console.dir);
 app.get("/", async (req, res) => {
 	res.send("Server is running");
 });
 app.listen(port, () => {
-    console.log("Server is working", port);
+	console.log("Server is working", port);
 });
