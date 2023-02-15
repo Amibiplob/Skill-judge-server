@@ -10,6 +10,7 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+
 /////////START//////////
 async function run() {
   try {
@@ -26,8 +27,8 @@ async function run() {
 
 
     
-  } finally {
-  }
+   }
+  finally{}
 }
 run().catch(console.dir);
 
