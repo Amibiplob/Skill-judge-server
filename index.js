@@ -28,6 +28,7 @@ const client = new MongoClient(uri, {
 const blog = require("./blog");
 const compiler = require("./compiler");
 const jwt = require("./jwt");
+const user = require("./user");
 
 
 
@@ -60,6 +61,7 @@ async function run() {
 		app.use("/blog", blog);
 		app.use("/compiler", compiler);
 		app.use("/jwt", jwt);
+		app.use("/user", user);
 
 
 		//////////////////////////
@@ -188,53 +190,7 @@ async function run() {
 			res.send(user);
 		});
 
-		//getUser by email
-		app.get("/user", verifyJWT, async (req, res) => {
-			const email = req.query.email;
-			const query = { email: email };
-			const users = await userCollection.find(query).toArray();
-			res.send(users);
-		});
 
-		//Create user
-		app.post("/user", async (req, res) => {
-			const user = req.body;
-			const query = { email: user.email };
-			const alreadyExist = await userCollection.findOne(query);
-			if (alreadyExist) {
-				res.send(JSON.stringify({ message: "User already exists" }));
-				return;
-			}
-			const result = await userCollection.insertOne(user);
-			res.send(result);
-		});
-
-		//update users information
-		app.put("/updateUser", async (req, res) => {
-			const userEmail = req.query.email;
-			// console.log(userEmail);
-			const data = req.body;
-			const { name, email, mobile, occupation, address, photo } = data;
-			// console.log(data);
-			const filter = { email: userEmail };
-			const options = { upsert: true };
-			const updatedDoc = {
-				$set: {
-					name,
-					email,
-					occupation,
-					mobile,
-					address,
-					photo,
-				},
-			};
-			const result = await userCollection.updateOne(
-				filter,
-				updatedDoc,
-				options
-			);
-			res.send(result);
-		});
 
 		// quiz
 		app.get("/quiz", async (req, res) => {
@@ -298,27 +254,6 @@ async function run() {
 			}
 		});
 
-		//getUser by email
-		app.get("/user", async (req, res) => {
-			const email = req.query.email;
-			console.log(email);
-			const query = { email: email };
-			const users = await userCollection.find(query).toArray();
-			res.send(users);
-		});
-
-		//Create user
-		app.post("/user", async (req, res) => {
-			const user = req.body;
-			const query = { email: user.email };
-			const alreadyExist = await userCollection.findOne(query);
-			if (alreadyExist) {
-				return;
-			}
-			const result = await userCollection.insertOne(user);
-			res.send(result);
-			// console.log(user);
-		});
 
 		// sourav code start here
 
