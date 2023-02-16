@@ -51,6 +51,8 @@ async function run() {
 		const commentsCollection = database.collection("QnaComments");
 		const teamCollection = database.collection("team-member");
 		const problemsCollection = database.collection("problems");
+		const compilerResultCollection = database.collection("compilerResult");
+		
 
 
 
@@ -174,6 +176,13 @@ async function run() {
 			const result = await problemsCollection.find(query).toArray();
 			res.send(result);
 		});
+		// -------srabon compiler data update-------
+		app.post("/compileResult", async (req, res) => {
+			const body = req.body;
+			const result = await compilerResultCollection.insertOne(body);
+			res.send(result);
+		});
+        // -------srabon compiler data update-------
 
 		/*---- Afzal working here ----*/
 		// Get All users
