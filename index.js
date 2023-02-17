@@ -278,6 +278,19 @@ async function run() {
 			const users = await quizSavedCollection.find(query).toArray();
 			res.send(users);
 		});
+
+				app.get("/singlesubmission", verifyJWT, async (req, res) => {
+			const email = req.query.email;
+			const query = { email: email };
+			const users = await compilerResultCollection.find(query).toArray();
+			res.send(users);
+		});
+		app.get("/allsubmission", verifyJWT, async (req, res) => {
+			const query = {};
+			const users = await compilerResultCollection.find(query).toArray();
+			res.send(users);
+		});
+
 		app.post("/quiz", async (req, res) => {
 			const addQuiz = req.body;
 			const result = await quizCollection.insertOne(addQuiz);
