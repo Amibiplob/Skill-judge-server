@@ -223,7 +223,17 @@ async function run() {
 			res.json(result);
 			// console.log(saved);
 		});
-
+		app.get("/singlequiz", verifyJWT, async (req, res) => {
+			const email = req.query.email;
+			const query = { email: email };
+			const users = await quizSavedCollection.find(query).toArray();
+			res.send(users);
+		});
+		app.get("/allquiz", verifyJWT, async (req, res) => {
+			const query = {};
+			const users = await quizSavedCollection.find(query).toArray();
+			res.send(users);
+		});
 		app.post("/quiz", async (req, res) => {
 			const addQuiz = req.body;
 			const result = await quizCollection.insertOne(addQuiz);
