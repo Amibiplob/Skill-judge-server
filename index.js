@@ -435,6 +435,18 @@ async function run() {
 			res.send({ updateResult, update });
 		});
 
+
+		app.get("/paid", async (req, res) => {
+				
+				const query = {};
+
+				if (req.query.email) {
+					query = { email: req.query.email };
+				}
+				const result = await paymentsCollection.find(query).toArray();
+				console.log(result);
+				res.send(result);
+			});
 		app.post("/qna", async (req, res) => {
 			const qna = req.body;
 			const result = await questionCollection.insertOne(qna);
