@@ -37,6 +37,8 @@ async function run() {
     try {
         const database = client.db("Skill-judge");
         const userCollection = database.collection("user");
+        const problemsCollection = database.collection("problems");
+        const compilerResultCollection = database.collection("compilerResult");
 
         //Create user
         user.post("/", async (req, res) => {
@@ -49,6 +51,23 @@ async function run() {
             }
             const result = await userCollection.insertOne(user);
             res.send(result);
+        });
+
+        // get all user
+        user.get("/communities", async (req, res) => {
+            try {
+                const users = await userCollection.countDocuments();
+                const problemSolves =
+                    await compilerResultCollection.countDocuments();
+                const problems = await problemsCollection.countDocuments();
+                res.status(200).send({
+                    users,
+                    problemSolves,
+                    problems,
+                });
+            } catch (error) {
+                res.status(501).json({ message: error.message });
+            }
         });
 
         // verify admin
@@ -69,20 +88,24 @@ async function run() {
         };
 
         // get admin user by email
-        app.get("/users/admin/:adminEmail",verifyJWT, verifyAdmin, async (req, res) => {
-            try {
-                const query = {
-                    email: req.params.adminEmail,
-                };
-                const user = await userCollection.findOne(query);
-
-                res.status(200).send({
-                    isAdmin: user?.role === "admin",
-                });
-            } catch (error) {
-                res.status(500).send({ message: error.message });
+        user.get(
+            "/users/admin/:adminEmail",
+            verifyJWT,
+            verifyAdmin,
+            async (req, res) => {
+                try {
+                    const query = {
+                        email: req.params.adminEmail,
+                    };
+                    const user = await userCollection.findOne(query);
+                    res.status(200).send({
+                        isAdmin: user?.role === "admin",
+                    });
+                } catch (error) {
+                    res.status(500).send({ message: error.message });
+                }
             }
-        });
+        );
 
         //getUser by email
         user.get("/", verifyJWT, async (req, res) => {
