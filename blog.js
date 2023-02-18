@@ -36,8 +36,6 @@ async function run() {
     const result = await blogCollection.findOne(query);
     res.send([result]);
   });
-
-
     
 	blog.patch("/comment", async (req, res) => {
     const comment = req.body;
