@@ -62,9 +62,6 @@ async function run() {
     console.log(result);
        res.send(result);
   });
-
-
-    
   } finally {
   }
 }
