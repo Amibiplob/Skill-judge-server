@@ -60,7 +60,7 @@ async function run() {
 
 
     //update users information
-    user.patch("/updateUser", async (req, res) => {
+    user.patch("/updateUser", verifyJWT, async (req, res) => {
       const userEmail = req.query.email;
       const filter = { email: userEmail };
       const options = { upsert: true };
