@@ -34,7 +34,7 @@ function verifyJWT(req, res, next) {
 
 /////////START//////////
 async function run() {
-    try {
+try {
         const database = client.db("Skill-judge");
         const userCollection = database.collection("user");
         const problemsCollection = database.collection("problems");
