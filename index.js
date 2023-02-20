@@ -57,6 +57,7 @@ async function run() {
 		const teamCollection = database.collection("team-member");
 		const problemsCollection = database.collection("problems");
 		const compilerResultCollection = database.collection("compilerResult");
+		const reviewsCollection = database.collection("reviewsCollection");
 
 
 
@@ -254,7 +255,7 @@ async function run() {
 			res.send(users);
 		});
 
-				app.get("/singlesubmission", verifyJWT, async (req, res) => {
+		app.get("/singlesubmission", verifyJWT, async (req, res) => {
 			const email = req.query.email;
 			const query = { email: email };
 			const users = await compilerResultCollection.find(query).toArray();
@@ -414,22 +415,30 @@ async function run() {
 
 
 		app.get("/paid", async (req, res) => {
-				
-				const query = {};
 
-				if (req.query.email) {
-					query = { email: req.query.email };
-				}
-				const result = await paymentsCollection.find(query).toArray();
-				console.log(result);
-				res.send(result);
-			});
+			const query = {};
+
+			if (req.query.email) {
+				query = { email: req.query.email };
+			}
+			const result = await paymentsCollection.find(query).toArray();
+			console.log(result);
+			res.send(result);
+		});
 		app.post("/qna", async (req, res) => {
 			const qna = req.body;
 			const result = await questionCollection.insertOne(qna);
 
 			res.send(result);
 		});
+
+		// Get reviews
+		app.get("/reviews", async (req, res) => {
+			const query = {};
+			const reviews = await reviewsCollection.find(query).toArray();
+			res.send(reviews);
+		});
+
 	} finally {
 	}
 }
