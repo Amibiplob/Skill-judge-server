@@ -37,19 +37,6 @@ const user = require("./user");
 
 
 async function run() {
-<<<<<<< HEAD
-  try {
-    const database = client.db("Skill-judge");
-    const qnaCollection = database.collection("qna");
-    const servicesCollection = database.collection("services");
-    const paymentsCollection = database.collection("payments");
-    const topQuestionsCollection = database.collection("topquestions");
-    const userCollection = database.collection("user");
-
-    app.get("/qnasingle/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-=======
 	try {
 		const database = client.db("Skill-judge");
 		const questionCollection = database.collection("userquestionCollection");
@@ -65,10 +52,10 @@ async function run() {
 		const teamCollection = database.collection("team-member");
 		const problemsCollection = database.collection("problems");
 		const compilerResultCollection = database.collection("compilerResult");
+		const reviewsCollection = database.collection("reviewsCollection");
 
 
 
->>>>>>> 350f08e25cf5e7d2acbfce03ba7fe0389b7b3720
 
 
 		////////////////////////////
@@ -100,119 +87,6 @@ async function run() {
 			})
 		}
 
-<<<<<<< HEAD
-    app.get("/qna", async (req, res) => {
-      const query = {};
-
-      const cursor = qnaCollection.find(query);
-
-      const result = await cursor.toArray();
-
-      res.send(result);
-    });
-    // partial search question
-    app.get("/search-qna", async (req, res) => {
-      try {
-        let searchResult;
-        if (req.query.searchQuery) {
-          const cursor = questionCollection.find({
-            $text: { $search: `\"${req.query.searchQuery}\"` },
-          });
-          searchResult = await cursor.toArray();
-        } else {
-          searchResult = await questionCollection.find({}).toArray();
-        }
-        res.send(searchResult);
-      } catch (error) {
-        res.status(500).json({ message: "something went wrong!" });
-      }
-    });
-    //userCollection
-
-    app.get("/user", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-
-      const result = await qnaCollection.findOne(query);
-
-      res.send(result);
-    });
-
-    app.post("/user", async (req, res) => {
-      const user = req.body;
-      const result = await userCollection.insertOne(user);
-
-      res.send(result);
-    });
-
-    // services
-    app.get("/services", async (req, res) => {
-      const query = {};
-      const result = await servicesCollection.find(query).toArray();
-      res.send(result);
-    });
-    app.get("/book/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await servicesCollection.find(query).toArray();
-      res.send(result);
-    });
-
-    // top-questions
-    app.get("/topquestions", async (req, res) => {
-      const query = {};
-      const result = await topQuestionsCollection.find(query).toArray();
-      res.send(result);
-    });
-    app.get("/topquestions/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await topQuestionsCollection.find(query).toArray();
-      res.send(result);
-    });
-
-    // payments
-    app.post("/create-payment-intent", async (req, res) => {
-      const payment = req.body;
-      const price = payment.price;
-      const amount = parseFloat(price * 100);
-      const paymentIntent = await stripe.paymentIntents.create({
-        currency: "usd",
-        amount: amount,
-        payment_method_types: ["card"],
-      });
-      res.send({
-        clientSecret: paymentIntent.client_secret,
-      });
-    });
-
-    app.post("/payments", async (req, res) => {
-      const payments = req.body;
-      const result = await paymentsCollection.insertOne(payments);
-      const id = payments.paymentId;
-      const filter = { _id: ObjectId(id) };
-      const updateDos = {
-        $set: {
-          paid: true,
-          transactionId: payments.transactionId,
-        },
-      };
-      const updateResult = await servicesCollection.updateOne(
-        filter,
-        updateDos
-      );
-      res.send({ updateResult, update });
-    });
-
-    app.post("/qna", async (req, res) => {
-      const qna = req.body;
-      const result = await qnaCollection.insertOne(qna);
-
-      res.send(result);
-    });
-  } finally {
-  }
-=======
 
 
 
@@ -362,7 +236,7 @@ async function run() {
 			res.send(users);
 		});
 
-				app.get("/singlesubmission", verifyJWT, async (req, res) => {
+		app.get("/singlesubmission", verifyJWT, async (req, res) => {
 			const email = req.query.email;
 			const query = { email: email };
 			const users = await compilerResultCollection.find(query).toArray();
@@ -522,25 +396,32 @@ async function run() {
 
 
 		app.get("/paid", async (req, res) => {
-				
-				const query = {};
 
-				if (req.query.email) {
-					query = { email: req.query.email };
-				}
-				const result = await paymentsCollection.find(query).toArray();
-				console.log(result);
-				res.send(result);
-			});
+			const query = {};
+
+			if (req.query.email) {
+				query = { email: req.query.email };
+			}
+			const result = await paymentsCollection.find(query).toArray();
+			console.log(result);
+			res.send(result);
+		});
 		app.post("/qna", async (req, res) => {
 			const qna = req.body;
 			const result = await questionCollection.insertOne(qna);
 
 			res.send(result);
 		});
+
+		// Get reviews
+		app.get("/reviews", async (req, res) => {
+			const query = {};
+			const reviews = await reviewsCollection.find(query).toArray();
+			res.send(reviews);
+		});
+
 	} finally {
 	}
->>>>>>> 350f08e25cf5e7d2acbfce03ba7fe0389b7b3720
 }
 
 run().catch(console.dir);
