@@ -131,6 +131,24 @@ try {
             );
             res.send(result);
         });
+
+
+	user.delete("/:id", async (req, res) => {
+    const id = req.params.id;
+    const filter = { _id: ObjectId(id) };
+    const user = await userCollection.deleteOne(filter);
+    res.send(user);
+  });
+
+
+
+
+
+
+
+
+
+
     } finally {
     }
 }

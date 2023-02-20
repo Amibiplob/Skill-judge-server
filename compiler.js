@@ -14,7 +14,7 @@ const { loadPyodide } = require("pyodide");
 async function run() {
   try {
     const database = client.db("Skill-judge");
-    const userCollection = database.collection("user");
+		const compilerResultCollection = database.collection("compilerResult");
 
 
 
@@ -24,6 +24,27 @@ compiler.post("/", async (req, res) => {
 
     res.json(result);
   });
+
+compiler.post("/py", async (req, res) => {
+    let pyodide = await loadPyodide();
+    let result = await pyodide.runPythonAsync(req.body.code);
+
+    res.json(result);
+  });
+
+	compiler.post("/result", async (req, res) => {
+    const body = req.body;
+    const result = await compilerResultCollection.insertOne(body);
+    res.send(result);
+  });
+
+
+
+
+
+
+
+
 
 
     

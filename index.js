@@ -7,7 +7,11 @@ require("dotenv").config();
 const jsonWebToken = require('jsonwebtoken');
 
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(express.json());
 const port = process.env.PORT || 5000;
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -29,6 +33,7 @@ const blog = require("./blog");
 const compiler = require("./compiler");
 const jwt = require("./jwt");
 const user = require("./user");
+const review = require("./review");
 
 
 
@@ -65,6 +70,7 @@ async function run() {
 		app.use("/compiler", compiler);
 		app.use("/jwt", jwt);
 		app.use("/user", user);
+		app.use("/review", review);
 
 
 		//////////////////////////
@@ -178,6 +184,9 @@ async function run() {
 			res.send(result);
 		});
 		// -------srabon compiler data update-------
+
+
+		//////////////////// ////////////////////////              compailer/result      ////////////////////////////////////////////         //////////
 		app.post("/compileResult", async (req, res) => {
 			const body = req.body;
 			const result = await compilerResultCollection.insertOne(body);
@@ -193,30 +202,40 @@ async function run() {
 			res.send(allUsers);
 		});
 		// Delete user
-		app.delete("/user/:id", async (req, res) => {
-			const id = req.params.id;
-			const filter = { _id: ObjectId(id) };
-			const user = await userCollection.deleteOne(filter);
-			res.send(user);
-		});
+
+
+
+
+
+
+/////////////////////////////////            user/:id ///////////////////////////////////////////////
+
+
+
+		// app.delete("/user/:id", async (req, res) => {
+		// 	const id = req.params.id;
+		// 	const filter = { _id: ObjectId(id) };
+		// 	const user = await userCollection.deleteOne(filter);
+		// 	res.send(user);
+		// });
 
 
 
 		// quiz
-		app.get("/quiz", async (req, res) => {
-			const query = {};
-			const cursor = quizCollection.find(query);
-			const result = await cursor.toArray();
+		// app.get("/quiz", async (req, res) => {
+		// 	const query = {};
+		// 	const cursor = quizCollection.find(query);
+		// 	const result = await cursor.toArray();
 
-			res.send(result);
-		});
+		// 	res.send(result);
+		// });
 
-		app.get("/quiz/:name", async (req, res) => {
-			const name = req.params.name;
-			const query = { name: name };
-			const result = await totalQuizCollection.find(query).toArray();
-			res.send(result);
-		});
+		// app.get("/quiz/:name", async (req, res) => {
+		// 	const name = req.params.name;
+		// 	const query = { name: name };
+		// 	const result = await totalQuizCollection.find(query).toArray();
+		// 	res.send(result);
+		// });
 		// saved quiz/srabon
 		app.post("/savedquiz", async (req, res) => {
 			const saved = req.body;
@@ -248,11 +267,11 @@ async function run() {
 			res.send(users);
 		});
 
-		app.post("/quiz", async (req, res) => {
-			const addQuiz = req.body;
-			const result = await quizCollection.insertOne(addQuiz);
-			res.send(result);
-		});
+		// app.post("/quiz", async (req, res) => {
+		// 	const addQuiz = req.body;
+		// 	const result = await quizCollection.insertOne(addQuiz);
+		// 	res.send(result);
+		// });
 
 		app.delete("/quiz", async (req, res) => {
 			const id = req.query.id;
