@@ -7,11 +7,7 @@ require("dotenv").config();
 const jsonWebToken = require('jsonwebtoken');
 
 
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 5000;
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -34,6 +30,7 @@ const compiler = require("./compiler");
 const jwt = require("./jwt");
 const user = require("./user");
 const review = require("./review");
+const community = require("./community");
 
 
 
@@ -71,6 +68,7 @@ async function run() {
 		app.use("/jwt", jwt);
 		app.use("/user", user);
 		app.use("/review", review);
+		app.use("/community", community);
 
 
 		//////////////////////////
