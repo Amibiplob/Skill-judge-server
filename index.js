@@ -52,6 +52,7 @@ async function run() {
 		const teamCollection = database.collection("team-member");
 		const problemsCollection = database.collection("problems");
 		const compilerResultCollection = database.collection("compilerResult");
+		const reviewsCollection = database.collection("reviewsCollection");
 
 
 
@@ -411,6 +412,14 @@ async function run() {
 
 			res.send(result);
 		});
+
+		// Get reviews
+		app.get("/reviews", async (req, res) => {
+			const query = {};
+			const reviews = await reviewsCollection.find(query).toArray();
+			res.send(reviews);
+		});
+
 	} finally {
 	}
 }
