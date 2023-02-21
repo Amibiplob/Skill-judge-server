@@ -24,21 +24,19 @@ async function run() {
       res.send(result);
     });
 
-    community.post("/", async (req, res) => {
-      const community = req.body;
-      const result = await communityPostCollection.insertOne(community);
+    community.post("/post", async (req, res) => {
+      const post = req.body;
+      const result = await communityPostCollection.insertOne(post);
       res.send(result);
     });
 
 
-	community.get("/post/:id", async (req, res) => {
+community.get("/post/:id", async (req, res) => {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
     const result = await communityPostCollection.findOne(query);
     res.send([result]);
   });
-
-
 
 
   } finally {
