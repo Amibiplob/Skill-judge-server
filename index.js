@@ -220,20 +220,20 @@ async function run() {
 
 
 		// quiz
-		// app.get("/quiz", async (req, res) => {
-		// 	const query = {};
-		// 	const cursor = quizCollection.find(query);
-		// 	const result = await cursor.toArray();
+		app.get("/quiz", async (req, res) => {
+			const query = {};
+			const cursor = quizCollection.find(query);
+			const result = await cursor.toArray();
 
-		// 	res.send(result);
-		// });
+			res.send(result);
+		});
 
-		// app.get("/quiz/:name", async (req, res) => {
-		// 	const name = req.params.name;
-		// 	const query = { name: name };
-		// 	const result = await totalQuizCollection.find(query).toArray();
-		// 	res.send(result);
-		// });
+		app.get("/quiz/:name", async (req, res) => {
+			const name = req.params.name;
+			const query = { name: name };
+			const result = await totalQuizCollection.find(query).toArray();
+			res.send(result);
+		});
 		// saved quiz/srabon
 		app.post("/savedquiz", async (req, res) => {
 			const saved = req.body;
