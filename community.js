@@ -31,25 +31,12 @@ async function run() {
     });
 
 
-    // 	community.get("/post/:id", async (req, res) => {
-    //     const id = req.params.id;
-    //     const query = { _id: ObjectId(id) };
-    //     const result = await communityCollection.findOne(query);
-    //     res.send([result]);
-    //   });
-
-
-    // community.get("/post/:id",async((req,res)=>{
-    //     const id=req.params
-
-    //     console.log(id);
-    // }))
-
-
-
-
-
-
+community.get("/post/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id) };
+    const result = await communityPostCollection.findOne(query);
+    res.send([result]);
+  });
 
 
   } finally {
