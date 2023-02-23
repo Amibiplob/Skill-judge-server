@@ -413,20 +413,16 @@ async function run() {
 
 
 		app.get("/paid", async (req, res) => {
-
 			const query = {};
-
 			if (req.query.email) {
 				query = { email: req.query.email };
 			}
 			const result = await paymentsCollection.find(query).toArray();
-			console.log(result);
 			res.send(result);
 		});
 		app.post("/qna", async (req, res) => {
 			const qna = req.body;
 			const result = await questionCollection.insertOne(qna);
-
 			res.send(result);
 		});
 
@@ -435,6 +431,28 @@ async function run() {
 			const query = {};
 			const reviews = await reviewsCollection.find(query).toArray();
 			res.send(reviews);
+		});
+
+		// dashboard
+		app.get("/dashboard/widget", async (req, res) => {
+			try {
+					const quiz = await quizSavedCollection.countDocuments();
+					const submissions = await compilerResultCollection.countDocuments();
+					const users = await userCollection.countDocuments()
+					const paid = await paymentsCollection.find({}).toArray();
+					const totalEarnings = paid.reduce((acc, cur) => {
+						acc = parseFloat(cur.price) + acc
+						return acc;
+					}, 0)
+                res.status(200).send({
+                    quiz,
+                    submissions,
+					users,
+					totalEarnings
+                });
+            } catch (error) {
+                res.status(501).json({ message: error.message });
+            }
 		});
 
 	} finally {
