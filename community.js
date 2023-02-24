@@ -30,13 +30,37 @@ async function run() {
       res.send(result);
     });
 
+    community.put("/post/like", async (req, res) => {
+      const info = req.body;
+      const filter = { _id: ObjectId(info.postId) }
+      const updatedDoc = {
+        $push: {
+          "likes": info.userId
+        }
+      }
+      const result = await communityPostCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    })
 
-community.get("/post/:id", async (req, res) => {
-    const id = req.params.id;
-    const query = { _id: ObjectId(id) };
-    const result = await communityPostCollection.findOne(query);
-    res.send([result]);
-  });
+    community.put("/post/unlike", async (req, res) => {
+      const info = req.body;
+      const filter = { _id: ObjectId(info.postId) }
+      const updatedDoc = {
+        $pull: {
+          "likes": info.userId
+        }
+      }
+      const result = await communityPostCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    })
+
+
+    community.get("/post/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await communityPostCollection.findOne(query);
+      res.send([result]);
+    });
 
 
   } finally {
