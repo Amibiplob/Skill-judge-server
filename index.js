@@ -241,6 +241,15 @@ async function run() {
 			const problem = await problemsCollection.insertOne(req.body);
 			res.send(problem);
 		});
+		app.delete("/deleteProblem/:id", async (req, res) => {
+			const query = { _id: ObjectId(req.params.id) };
+			const result = await problemsCollection.deleteOne(query);
+			if (result.deletedCount > 0) {
+				res.send(result);
+			} else {
+				res.send("No documents matched the query. Deleted 0 documents.");
+			}
+		})
 
 		// app.post("/quiz", async (req, res) => {
 		// 	const addQuiz = req.body;
