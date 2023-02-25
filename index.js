@@ -4,14 +4,12 @@ const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
 
 const app = express();
 require("dotenv").config();
-const jsonWebToken = require('jsonwebtoken');
-
+const jsonWebToken = require("jsonwebtoken");
 
 app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 5000;
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@skill-judge.old6dyc.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -20,10 +18,7 @@ const client = new MongoClient(uri, {
 	serverApi: ServerApiVersion.v1,
 });
 
-
 ////////////////
-
-
 
 const blog = require("./blog");
 const compiler = require("./compiler");
@@ -32,11 +27,7 @@ const user = require("./user");
 const review = require("./review");
 const community = require("./community");
 
-
-
 ////////////////////
-
-
 
 async function run() {
 	try {
@@ -56,12 +47,7 @@ async function run() {
 		const compilerResultCollection = database.collection("compilerResult");
 		const reviewsCollection = database.collection("reviewsCollection");
 
-
-
-
-
 		////////////////////////////
-
 
 		app.use("/blog", blog);
 		app.use("/compiler", compiler);
@@ -70,31 +56,28 @@ async function run() {
 		app.use("/review", review);
 		app.use("/community", community);
 
-
 		//////////////////////////
-
 
 		// Function for verify jwt
 		function verifyJWT(req, res, next) {
 			const authHeader = req.headers.authorization;
 			if (!authHeader) {
-				return res.status(401).send('unauthorized access');
+				return res.status(401).send("unauthorized access");
 			}
-			const token = authHeader.split(' ')[1];
+			const token = authHeader.split(" ")[1];
 
-			jsonWebToken.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
-				if (err) {
-					return res.status(403).send({ message: 'forbidden access' });
+			jsonWebToken.verify(
+				token,
+				process.env.ACCESS_TOKEN,
+				function (err, decoded) {
+					if (err) {
+						return res.status(403).send({ message: "forbidden access" });
+					}
+					req.decoded = decoded;
+					next();
 				}
-				req.decoded = decoded;
-				next();
-			})
+			);
 		}
-
-
-
-
-
 
 		// Question
 		app.get("/qnasingle/:id", async (req, res) => {
@@ -115,8 +98,8 @@ async function run() {
 		app.get("/team", async (req, res) => {
 			const query = {};
 			const result = await teamCollection.find(query).toArray();
-			res.send(result)
-		})
+			res.send(result);
+		});
 
 		// qna-comment/srabon
 		app.post("/comment", async (req, res) => {
@@ -183,7 +166,6 @@ async function run() {
 		});
 		// -------srabon compiler data update-------
 
-
 		//////////////////// ////////////////////////              compailer/result      ////////////////////////////////////////////         //////////
 		app.post("/compileResult", async (req, res) => {
 			const body = req.body;
@@ -201,14 +183,7 @@ async function run() {
 		});
 		// Delete user
 
-
-
-
-
-
-/////////////////////////////////            user/:id ///////////////////////////////////////////////
-
-
+		/////////////////////////////////            user/:id ///////////////////////////////////////////////
 
 		// app.delete("/user/:id", async (req, res) => {
 		// 	const id = req.params.id;
@@ -216,8 +191,6 @@ async function run() {
 		// 	const user = await userCollection.deleteOne(filter);
 		// 	res.send(user);
 		// });
-
-
 
 		// quiz
 		app.get("/quiz", async (req, res) => {
@@ -264,6 +237,10 @@ async function run() {
 			const users = await compilerResultCollection.find(query).toArray();
 			res.send(users);
 		});
+		app.post("/addProblem", async (req, res) => {
+			const problem = await problemsCollection.insertOne(req.body);
+			res.send(problem);
+		});
 
 		// app.post("/quiz", async (req, res) => {
 		// 	const addQuiz = req.body;
@@ -285,7 +262,6 @@ async function run() {
 
 		// Compiler
 
-
 		// partial search question
 		app.get("/search-qna", async (req, res) => {
 			try {
@@ -303,7 +279,6 @@ async function run() {
 				res.status(500).json({ message: "something went wrong!" });
 			}
 		});
-
 
 		// sourav code start here
 
@@ -411,7 +386,6 @@ async function run() {
 			res.send({ updateResult, update });
 		});
 
-
 		app.get("/paid", async (req, res) => {
 			const query = {};
 			if (req.query.email) {
@@ -436,25 +410,24 @@ async function run() {
 		// dashboard
 		app.get("/dashboard/widget", async (req, res) => {
 			try {
-					const quiz = await quizSavedCollection.countDocuments();
-					const submissions = await compilerResultCollection.countDocuments();
-					const users = await userCollection.countDocuments()
-					const paid = await paymentsCollection.find({}).toArray();
-					const totalEarnings = paid.reduce((acc, cur) => {
-						acc = parseFloat(cur.price) + acc
-						return acc;
-					}, 0)
-                res.status(200).send({
-                    quiz,
-                    submissions,
+				const quiz = await quizSavedCollection.countDocuments();
+				const submissions = await compilerResultCollection.countDocuments();
+				const users = await userCollection.countDocuments();
+				const paid = await paymentsCollection.find({}).toArray();
+				const totalEarnings = paid.reduce((acc, cur) => {
+					acc = parseFloat(cur.price) + acc;
+					return acc;
+				}, 0);
+				res.status(200).send({
+					quiz,
+					submissions,
 					users,
-					totalEarnings
-                });
-            } catch (error) {
-                res.status(501).json({ message: error.message });
-            }
+					totalEarnings,
+				});
+			} catch (error) {
+				res.status(501).json({ message: error.message });
+			}
 		});
-
 	} finally {
 	}
 }
