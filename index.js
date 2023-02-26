@@ -78,7 +78,26 @@ async function run() {
 				}
 			);
 		}
-
+		const verifyAdmin = async (req, res, next) => {
+			next();
+		};
+		app.get(
+			"/users/admin/:adminEmail",
+			verifyAdmin,
+			async (req, res) => {
+				try {
+					const query = {
+						email: req.params.adminEmail,
+					};
+					const user = await userCollection.findOne(query);
+					res.status(200).send({
+						isAdmin: user?.role === "admin",
+					});
+				} catch (error) {
+					res.status(500).send({ message: error.message });
+				}
+			}
+		);
 		// Question
 		app.get("/qnasingle/:id", async (req, res) => {
 			const id = req.params.id;
@@ -249,7 +268,7 @@ async function run() {
 			} else {
 				res.send("No documents matched the query. Deleted 0 documents.");
 			}
-		})
+		});
 
 		// app.post("/quiz", async (req, res) => {
 		// 	const addQuiz = req.body;
