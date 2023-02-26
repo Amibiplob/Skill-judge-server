@@ -34,7 +34,7 @@ function verifyJWT(req, res, next) {
 
 /////////START//////////
 async function run() {
-try {
+    try {
         const database = client.db("Skill-judge");
         const userCollection = database.collection("user");
         const problemsCollection = database.collection("problems");
@@ -133,12 +133,12 @@ try {
         });
 
 
-	user.delete("/:id", async (req, res) => {
-    const id = req.params.id;
-    const filter = { _id: ObjectId(id) };
-    const user = await userCollection.deleteOne(filter);
-    res.send(user);
-  });
+        user.delete("/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const user = await userCollection.deleteOne(filter);
+            res.send(user);
+        });
 
 
 

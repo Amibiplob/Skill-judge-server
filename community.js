@@ -54,6 +54,18 @@ async function run() {
       res.send(result);
     })
 
+    community.put("/post/comment", async (req, res) => {
+      const info = req.body;
+      const filter = { _id: ObjectId(info.postId) }
+      const updatedDoc = {
+        $push: {
+          "comments": { userId: info.userId, userPhoto: info.userPhoto, userName: info.userName, comment: info.comment, date: info.date }
+        }
+      }
+      const result = await communityPostCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    })
+
 
     community.get("/post/:id", async (req, res) => {
       const id = req.params.id;
