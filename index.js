@@ -239,7 +239,7 @@ async function run() {
 			const users = await quizSavedCollection.find(query).toArray();
 			res.send(users);
 		});
-		app.get("/allquiz", verifyJWT, async (req, res) => {
+		app.get("/allquiz", verifyJWT, verifyAdmin, async (req, res) => {
 			const query = {};
 			const users = await quizSavedCollection.find(query).toArray();
 			res.send(users);
@@ -251,16 +251,16 @@ async function run() {
 			const users = await compilerResultCollection.find(query).toArray();
 			res.send(users);
 		});
-		app.get("/allsubmission", verifyJWT, async (req, res) => {
+		app.get("/allsubmission", verifyJWT, verifyAdmin, async (req, res) => {
 			const query = {};
 			const users = await compilerResultCollection.find(query).toArray();
 			res.send(users);
 		});
-		app.post("/addProblem", async (req, res) => {
+		app.post("/addProblem", verifyAdmin, async (req, res) => {
 			const problem = await problemsCollection.insertOne(req.body);
 			res.send(problem);
 		});
-		app.delete("/deleteProblem/:id", async (req, res) => {
+		app.delete("/deleteProblem/:id", verifyAdmin, async (req, res) => {
 			const query = { _id: ObjectId(req.params.id) };
 			const result = await problemsCollection.deleteOne(query);
 			if (result.deletedCount > 0) {
@@ -276,7 +276,7 @@ async function run() {
 		// 	res.send(result);
 		// });
 
-		app.delete("/quiz", async (req, res) => {
+		app.delete("/quiz",  async (req, res) => {
 			const id = req.query.id;
 			const query = { _id: ObjectId(id) };
 			const result = await quizCollection.deleteOne(query);
@@ -411,7 +411,7 @@ async function run() {
 				filter,
 				updateDos
 			);
-			res.send({ updateResult, update });
+			res.send( result );
 		});
 
 		app.get("/paid", async (req, res) => {
